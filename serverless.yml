@@ -1,0 +1,56 @@
+service:
+  name: serverless-polly
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  region: eu-west-1
+  memorySize: 128
+
+functions:
+  getpost:
+    handler: getpost.index
+    description: Gets posts from dynamodb
+    events:
+      - http:
+          method: get
+          path: /
+  newpost:
+    handler: newpost.index
+    description: Adds new posts to dynamodb
+    events:
+      - http:
+          method: post
+          path: /
+  convertaudio:
+    handler: convertaudio.index
+    description: Converts text to mp3 voices throught Polly
+
+resources:
+  Resources:
+    pollyTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    staticBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: PublicRead
+    audioBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: PublicRead
