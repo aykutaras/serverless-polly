@@ -46,22 +46,34 @@ provider:
 
 functions:
   getpost:
-    handler: getpost.index
+    handler: getpost.main
     description: Gets posts from dynamodb
     events:
       - http:
           method: get
           path: /
+    environment:
+      tableName:
+        Ref: pollyTable
   newpost:
-    handler: newpost.index
+    handler: newpost.main
     description: Adds new posts to dynamodb
     events:
       - http:
           method: post
           path: /
+    environment:
+      tableName:
+        Ref: pollyTable
   convertaudio:
-    handler: convertaudio.index
+    handler: convertaudio.main
     description: Converts text to mp3 voices throught Polly
+    environment:
+      tableName:
+        Ref: pollyTable
+      audioBucket:
+        Ref: audioBucket
+      region: ${self:provider.region}
 
 resources:
   Resources:
@@ -87,3 +99,6 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         AccessControl: PublicRead
+
+custom:
+  webpackIncludeModules: true

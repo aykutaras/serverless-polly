@@ -5,7 +5,7 @@ export const main = async (event, context, callback) => {
     const docClient = new AWS.DynamoDB.DocumentClient();
     const postId = event.postId;
     const params = {
-        TableName: "aaras-polly"
+        TableName: process.env.tableName
     };
 
     if (postId !== '*') {
@@ -21,10 +21,6 @@ export const main = async (event, context, callback) => {
         };
 
         callback(null, response);
-        //    if (err) {
-        //        callback("Unable to read item. Error JSON:" + JSON.stringify(err, null, 2), null);
-        //    } else {
-        //    }
     } else {
         let scanData = await docClient.scan(params).promise();
         var response = {
@@ -34,8 +30,5 @@ export const main = async (event, context, callback) => {
         };
 
         callback(null, response);
-         //   if (err) {
-         //       callback("Unable to read item. Error JSON:" + JSON.stringify(err, null, 2), null);
-         //   }
     }
 };
