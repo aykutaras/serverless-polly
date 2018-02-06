@@ -1,7 +1,7 @@
 import AWS from "aws-sdk"
 
 // eslint-disable-next-line import/prefer-default-export
-export const main = async (event, context, cb) => {
+export const main = async (event, context, callback) => {
     const record = event.Records[0];
     if (record.eventName !== "INSERT") {
         callback(null, {"success": false});
@@ -36,7 +36,6 @@ async function upload(postId, stream) {
         ACL: 'public-read'
     };
     
-    console.log('uploading');
     await s3.upload(params).promise();   
     await activate(postId);
 }
@@ -60,6 +59,5 @@ async function activate(postId) {
         ReturnValues:"UPDATED_NEW"
     };
     
-    console.log('updating');
     await docClient.update(params).promise();
 }
