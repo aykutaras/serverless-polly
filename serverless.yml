@@ -20,7 +20,7 @@ provider:
           - ""
           -
             - "arn:aws:s3:::"
-            - Ref : audioBucket
+            - Ref : AudioBucket
             - "/*"
     - Effect: "Allow"
       Action:
@@ -44,7 +44,7 @@ provider:
               - ""
               - 
                 - 'table/'
-                - Ref: pollyTable
+                - Ref: PollyTable
     - Effect: "Allow"
       Action:
         - "polly:*"
@@ -72,7 +72,7 @@ functions:
               Content-Type: "'application/json'"
     environment:
       tableName:
-        Ref: pollyTable
+        Ref: PollyTable
   newpost:
     handler: newpost.main
     description: Adds new posts to dynamodb
@@ -91,20 +91,28 @@ functions:
               Content-Type: "'application/json'"
     environment:
       tableName:
-        Ref: pollyTable
+        Ref: PollyTable
   convertaudio:
     handler: convertaudio.main
     description: Converts text to mp3 voices throught Polly
+    events:
+      - stream:
+          type: dynamodb
+          batchSize: 1
+          arn:
+            Fn::GetAtt:
+              - PollyTable
+              - StreamArn
     environment:
       tableName:
-        Ref: pollyTable
+        Ref: PollyTable
       audioBucket:
-        Ref: audioBucket
+        Ref: AudioBucket
       region: ${self:provider.region}
 
 resources:
   Resources:
-    pollyTable:
+    PollyTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
@@ -118,14 +126,14 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    staticBucket:
+    StaticBucket:
       Type: AWS::S3::Bucket
       Properties:
         AccessControl: PublicRead
         WebsiteConfiguration:
           IndexDocument: index.html
           ErrorDocument: index.html
-    audioBucket:
+    AudioBucket:
       Type: AWS::S3::Bucket
       Properties:
         AccessControl: PublicRead

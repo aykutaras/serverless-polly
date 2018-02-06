@@ -1,7 +1,6 @@
-var API_ENDPOINT = "https://e134yxa5sh.execute-api.eu-west-1.amazonaws.com/dev/"
+var API_ENDPOINT = "https://APIURL/dev/"
 
-document.getElementById("sayButton").onclick = function(){
-
+document.getElementById("sayButton").onclick = function() {
     var inputData = {
         "voice": $('#voiceSelected option:selected').val(),
         "text" : $('#postText').val()
@@ -22,10 +21,8 @@ document.getElementById("sayButton").onclick = function(){
 }
 
 
-document.getElementById("searchButton").onclick = function(){
-
+document.getElementById("searchButton").onclick = function() {
     var postId = $('#postId').val();
-
 
     $.ajax({
         url: API_ENDPOINT + '?postId='+postId,
@@ -56,7 +53,7 @@ document.getElementById("searchButton").onclick = function(){
     });
 }
 
-document.getElementById("postText").onkeyup = function(){
+document.getElementById("postText").onkeyup = function() {
     var length = $(postText).val().length;
     document.getElementById("charCounter").textContent="Characters: " + length;
 }

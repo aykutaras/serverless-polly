@@ -1,7 +1,6 @@
 import AWS from "aws-sdk"
 import uuid from "uuid/v4"
 
-// eslint-disable-next-line import/prefer-default-export
 export const main = async (event, context, callback) => {
     const docClient = new AWS.DynamoDB.DocumentClient();
     const params = {

@@ -1,6 +1,5 @@
 import AWS from "aws-sdk"
 
-// eslint-disable-next-line import/prefer-default-export
 export const main = async (event, context, callback) => {
     const record = event.Records[0];
     if (record.eventName !== "INSERT") {
