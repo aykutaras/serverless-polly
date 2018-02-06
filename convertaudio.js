@@ -1,3 +1,5 @@
+import AWS from "aws-sdk"
+
 // eslint-disable-next-line import/prefer-default-export
 export const main = async (event, context, cb) => {
     const record = event.Records[0];
@@ -11,15 +13,15 @@ export const main = async (event, context, cb) => {
 };
 
 async function polly(postId, voice, text) {
-    var polly = new AWS.Polly();
-    var params = {
+    const polly = new AWS.Polly();
+    const params = {
         OutputFormat: "mp3",
         Text: text,
         TextType: "text",
         VoiceId: voice
     };
     
-    await polly.synthesizeSpeech(params).promise();
+    const data = await polly.synthesizeSpeech(params).promise();
     const stream = data.AudioStream;
     await upload(postId, stream);
 }
@@ -27,13 +29,14 @@ async function polly(postId, voice, text) {
 async function upload(postId, stream) {
     const s3 = new AWS.S3();
     
-    var params = {
+    const params = {
         Bucket: process.env.audioBucket,
         Key: postId + ".mp3",
         Body: stream,
         ACL: 'public-read'
     };
     
+    console.log('uploading');
     await s3.upload(params).promise();   
     await activate(postId);
 }
@@ -57,5 +60,6 @@ async function activate(postId) {
         ReturnValues:"UPDATED_NEW"
     };
     
+    console.log('updating');
     await docClient.update(params).promise();
 }

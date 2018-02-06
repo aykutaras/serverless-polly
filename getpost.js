@@ -14,9 +14,14 @@ export const main = async (event, context, callback) => {
         };
         
         let data = await docClient.get(params).promise();
+        let body = [];
+        if (data.Item !== undefined) {
+            body.push(data.Item);
+        }
+
         var response = {
             "statusCode": 200,
-            "body": [data.Item],
+            "body": body,
             "isBase64Encoded": false
         };
 
