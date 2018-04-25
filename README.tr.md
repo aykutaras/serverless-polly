@@ -1,6 +1,9 @@
 # AWS Serverless ve NLP Bölüm 1 - Lambda ve Polly ile Text-to-Speech
 
 ## Giriş
+
+*Başka dilde oku: [English](README.md), [Türkçe](README.tr.md).*
+
 3 bölüm olacak AWS ile NLP çözümleri serimizin birincisinde Amazon'un [Polly](https://aws.amazon.com/polly/), [Lambda](https://aws.amazon.com/lambda/), [API Gateway](https://aws.amazon.com/api-gateway/), [S3](https://aws.amazon.com/s3/) ve [DynamoDB](https://aws.amazon.com/dynamodb/) araçlarını ve javascript esnext yazılım dilini kullanarak hiç bir sunucu kurulumu gerektirmeden tamamen asenkron çalışan bir web uygulaması hazırlayacağız.
 
 Bu yazımızda sizlere AWS üzerinde sunucusuz olarak çalışabilen bir "Text-to-Speech" uygulama hazırlayacağız. Static bir web sayfası üzerinden aldığı metni Lambda yardımı ile DynamoDB veritabanına kaydedecek. Daha sonra DynamoDB'nın stream özelliği sayesinde asenkron olarak çalışan başka bir Lambda servisi ile belirtilen dil ve okuması istenen kişiye göre Polly servisine yollayıp bir s3 bucket'ına mp3 formatında kaydedecek. Daha sonra bu kaydettiğimiz ses dosyalarına yine aynı web uygulaması üzerinden erişmeyi sağlayacağız.
@@ -9,7 +12,7 @@ Servislerin ve uygulamanın deployment süreçlerini de yine "[Infrastructure as
 
 Yazının detaylarına inmeden çalışan uygulamayı görmek isterseniz yapmanız gereken şey oldukça basit:
 
-1. AWS hesabı
+1. AWS hesabı ve AccessKey ve Secret'a sahip bir user
 2. Node.js v8.11.1 
 3. Serverless Framework `npm install serverless -g`
 4. Gereksinimler kurulduktan sonra repo'yu clone'ladığınız klasörde:
@@ -19,7 +22,7 @@ npm install
 serverless deploy
 ```
 
-!!ÖRNEK GİF GELSİN!! 
+*!!ÖRNEK GİF GELSİN!!*
 
 ## Servis Diagramı
 Kullanacağımız servislerin tümü AWS tarafından sağlanan serverless çözümlerdir. Bu çözümlerin hazırlayacağımız uyglamada nasıl yer alacağına karar vermekse bize kalıyor. Uygulamanın örnek servis diagramını aşağıda görebilirsiniz:
@@ -40,7 +43,7 @@ Polly web uygulaması, Api Gateway'inde iki tane endpoint barındıracak. Birinc
 ### Lambda
 Uygulamamızın en önemli iki servisinden ilki. Lambda Amazon'un FaaS (Function as a Service) çözümü. Herhangi bir sunucuya ihtiyaç duymadan, kendi çoklayabilen, event-driven uygulamalar yazılmasına olanak sağlayan bir servis. Şu an Node.js (JavaScript), Python, Java (Java 8 destekliyor), C# (.NET Core) ve Go dilleri ile uygulamalar yazmayı destekliyor.
 
-Polly uygulamasında, TypeScript dili ile yazılmış 3 tane Lambda fonksiyonunu kullanacağız.
+Polly uygulamasında, Javascript ile yazılmış 3 tane Lambda fonksiyonunu kullanacağız.
 
 **1. GetPost Lambda:** Önceden işlenmiş olan kayıtları DynamoDB'den çekerek web sayfası üzerinde gösterimini sağlar.
 **2. NewPost Lambda:** Yeni bir metin bilgisi alarak işlenmesi için DynamoDB veritabanına kaydeder.
@@ -64,38 +67,56 @@ Polly uygulamamızın en önemli servisi. Amazon'un istenilen metinlerin sesleş
 Hal böyle olunca Polly uygulamasında, basit bir Lambda fonksiyonu ile istediğimiz metni istediğimiz formatta ses verisine dönüştürebiliyoruz.
 
 ## Uygulama
-### Node.js ve Typescript
-Bu yazı yazıldığı zaman AWS Lambda Node.js için v8.11.1 versiyonunu destekliyordu. Bu sebeple TypeScript ile geliştirdiğimiz uygulamayı Node.js v8.11.1'e göre derlememiz gerektiğine dikkat etmemiz gerekiyor. TypeScript compiler'ı bize bu konuda oldukça yardımcı oluyor. Eğer derlemeyi yaptığınız node sürümü v8.11.1 ise TypeScript otomatik olarak bu versiyona göre kendisini derliyor.
+### Node.js
+Bu yazı yazıldığı zaman AWS Lambda Node.js için v8.11.1 versiyonunu destekliyordu. Bu sebeple Javascript ile geliştirdiğimiz uygulamayı Node.js v8.11.1'e göre derlememiz gerektiğine dikkat etmemiz gerekiyor. Javascript Webpack module yükleyicisi ve Babel compiler'ı bize bu konuda oldukça yardımcı oluyor. Eğer derlemeyi yaptığınız node sürümü v8.11.1 ise Javascript Babel ve Webpack sayesinde otomatik olarak bu versiyona göre kendisini derliyor.
 
-#### Neden TypeScript?
-TypeScript, javascript dünyasında eksik olarak görülen bir çok özelliği içinde barındırıyor. Opsiyonel olarak değişken tiplerinin belirtilebiliyor olması, inheritance ve class yapılarının düzgün olması static typed dillerden gelen (java, c#, vs) bir çok yazılımcı için büyük bir nimet.
+#### Babel ve WebPack?
+Babel, javascript dünyasında her yeni gelen versiyonun tüm browserlarda ve node.js versiyonlarında çalışmamasından dolayı ortaya çıkmış bir compiler. Yaptığı şey kısaca siz hangi javascript versiyonu ile yazarsanız yazın istediğiniz herhangi bir javascript sürümüne göre kodunuzu optimize ediyor olması.
 
-Typescript ile node.js uygulaması geliştirirken dikkat etmemiz gereken en önemli nokta TypeScript'in nasıl derlenmesi gerektiğini belirten `tsconfig.json` dosyası.
-
-Polly `tsconfig.json`
+Polly `.babelrc`
 
 ```
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "sourceMap": true,
-    "lib": [
-      "esnext"
-    ],
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "paths": {
-        "*": ["src/*"]
-    },
-    "outDir": ".build/"
-  },
-  "include": [
-      "./src/**/*"
-  ]
+  "plugins": ["transform-runtime"],
+  "presets": ["env"]
 }
 ```
 
-Burada TypeScript compiler'ına `esnext` özelliklerinin tamamını kullanmasına izin verdiğimizi, `src` klasöründe kaynak dosyalarının olacağını ve derlenmiş dosyaları `.build` klasörü altına atmasını söylüyoruz.
+`.babelrc` dosyası babel'in javascript'i nasıl derleyeceğini belirliyor. Burada `presets` kısmındaki `env` değeri babel'in javascript'in en güncel versiyonuna göre işlem yapmasını sağlıyor.
+
+WebPack ise modüler olarak geliştirdiğimiz kodları verdiğimiz kurallara göre tek bir javascript dosyası halinde sunmaya yarıyor. Her bir Lambda fonksiyonu bir adet js dosyası kabul ettiği için uygulamamızı parçalı bir hiyerarşi ile yazdığımız zaman bu dosyalara nasıl erişeceğini bilemiyor. Bunun dışında javascript dosyalarının babel ile compile edilmesini de yine WebPack otomatize ediyor. WebPack dosyalar arasındaki ilişkileri belirleyip bunlara göre gereksinimleri birleştiriyor ve bize bir adet babel ile compile edilmiş javascript dosyası veriyor.
+
+WebPack'in modülleri düzgün tanıyabilmesi için `webpack.config.js` isminde bir dosya oluşturup nasıl konfigüre edilmesini istediğimizi belirtmemiz gerekiyor.
+
+Polly `webpack.config.js`
+
+```
+const path = require('path');
+// eslint-disable-next-line import/no-unresolved
+const slsw = require('serverless-webpack');
+const nodeExternals = require('webpack-node-externals');
+
+module.exports = {
+  entry: slsw.lib.entries,
+  target: 'node',
+  externals: [nodeExternals()],
+  module: {
+    loaders: [{
+      test: /\.js$/,
+      loaders: ['babel-loader'],
+      include: __dirname,
+      exclude: /node_modules/,
+    }],
+  },
+  output: {
+    libraryTarget: 'commonjs',
+    path: path.join(__dirname, '.webpack'),
+    filename: '[name].js',
+  },
+};
+```
+
+Bu konfigürasyon dosyası, serverless framework ile ilgili gereksinimleri ekliyor, javascript dosyalarının babel ile compile edilmesi gerektiğini belirtiyor ve javascript dependency structure'ının commonjs kütüphanesi ile çözümlenmesini sağlıyor.
  
 #### AWS Node.js SDK
 Node.js ile Amazon servislerini kullanmak için Amazon'un Node.js SDK'sı bize oldukça büyük kolaylık sağlıyor. Amazon'un sunduğu tüm servisler için hem Javascript hem de Typescript için kullanılan bu sdk sayesinde Amazon servisleri ile rahat bir şekilde haberleşebiliyoruz. Bir kaç örnek vermek gerekirse;
@@ -103,19 +124,48 @@ Node.js ile Amazon servislerini kullanmak için Amazon'un Node.js SDK'sı bize o
 DynamoDB'den kayıtları okumak için:
 
 ```
+const docClient = new AWS.DynamoDB.DocumentClient();
+const params = { TableName: process.env.tableName };
+let scanData = await docClient.scan(params).promise();
 ```
 
 Polly ile metni ses verisine dönüştürmek için:
 
 ```
+async function polly(postId, voice, text) {
+    const polly = new AWS.Polly();
+    const params = {
+        OutputFormat: "mp3",
+        Text: text,
+        TextType: "text",
+        VoiceId: voice
+    };
+
+    const data = await polly.synthesizeSpeech(params).promise();
+    const stream = data.AudioStream; // Voice as an AudioStream
+}
 ```
 
 Oluşturulan ses verisini S3'e mp3 formatında yüklemek içinse:
 
 ```
-```
-#### Yazılım Mimarisi
+async function upload(postId, stream) {
+    const s3 = new AWS.S3();
+    const params = {
+        Bucket: process.env.audioBucket,
+        Key: postId + ".mp3",
+        Body: stream,
+        ACL: 'public-read'
+    };
 
+    await s3.upload(params).promise();
+}
+```
+
+AWS Node.js SDK hem callback hem de promise yapısını destekliyor. Burada promise yapısını kullanarak Javascript async await özelliği ile çok daha okunabilir fonksiyonlar yazdık.
+
+#### Yazılım Mimarisi
+*TODO*
 
 ### Serverless Framework
 #### CloudFormation
