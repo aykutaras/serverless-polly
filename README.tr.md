@@ -17,8 +17,10 @@ Yazının detaylarına inmeden çalışan uygulamayı görmek isterseniz yapman�
 3. `npm install serverless -g`
 4. `npm install`
 5. `serverless deploy`
+6. API Gateway endpoint'ini `static/scripts.js` dosyasına ekle
+7. `static/` klasörünü oluşturulan static bucket'a yükle `aws s3 sync --acl public-read static/ s3://S3BUCKETNAME`
 
-*!!ÖRNEK GİF GELSİN!!*
+![InstallationGif](https://i.imgur.com/iBRROtd.gif)
 
 ## Servis Diagramı
 Kullanılan servislerin tümü AWS tarafından sağlanan serverless çözümlerdir. Bu çözümlerin hazırlanan uyglamada nasıl yer alacağına karar vermekse tabi ki yazılımcıya kalıyor. Uygulamanın örnek servis diagramını aşağıda görebilirsiniz:
@@ -70,7 +72,7 @@ Amazon'un metinlerin sesleştirilmesini sağlamak için sunduğu, yine serverles
 
 ## Uygulama
 ### Node.js
-Bu yazı yazıldığı zaman AWS Lambda Node.js için v8.11.1 versiyonunu destekliyordu. Bu sebeple Javascript ile geliştirilen uygulamaların Node.js v8.11.1'e göre derlenmesine dikkat edilmesi gerekiyor. Javascript Webpack module yükleyicisi ve Babel compiler'ı bu konuda oldukça yardımcı oluyor. Eğer derlemeyi yaptığınız node sürümü v8.11.1 ise Javascript Babel ve Webpack sayesinde otomatik olarak bu versiyona göre kendisini derliyor.
+Bu yazı yazıldığı zaman AWS Lambda Node.js için v8.10 versiyonunu destekliyordu. Bu sebeple Javascript ile geliştirilen uygulamaların Node.js v8.11.1'e göre derlenmesine dikkat edilmesi gerekiyor. Javascript Webpack module yükleyicisi ve Babel compiler'ı bu konuda oldukça yardımcı oluyor. Eğer derlemeyi yaptığınız node sürümü v8.11.1 ise Javascript Babel ve Webpack sayesinde otomatik olarak bu versiyona göre kendisini derliyor.
 
 #### Babel
 Babel, javascript dünyasında her yeni gelen versiyonun tüm browserlarda ve node.js versiyonlarında çalışmamasından dolayı ortaya çıkmış bir compiler. Kısaca babel uygulamaları hangi javascript versiyonu ile yazarsanız yazın istediğiniz herhangi bir javascript sürümüne göre -kodu optimize ederek- derlenmesini sağlıyor.
@@ -229,7 +231,7 @@ Polly uygulamasında kullandığımız `serverless.yml` dosyası ilk başta oldu
 ```
 provider:
   name: aws
-  runtime: nodejs8.11.1
+  runtime: nodejs8.10
   stage: dev
   region: eu-west-1
   memorySize: 128
@@ -274,7 +276,7 @@ provider:
       Resource: "*"
 ```
 
-Burada Polly uygulaması için Node.js 8.11.1 kullanacağımızı, 128 mb memory limiti olduğunu ve eu-west-1 region'ında bulunacağını belirtiyoruz. Ayrıca IAM role'leri ile de S3'e yazma, DynamoDB'ye okuma ve yazma ve Polly servisine de tam yetki veriyoruz.
+Burada Polly uygulaması için Node.js 8.10 kullanacağımızı, 128 mb memory limiti olduğunu ve eu-west-1 region'ında bulunacağını belirtiyoruz. Ayrıca IAM role'leri ile de S3'e yazma, DynamoDB'ye okuma ve yazma ve Polly servisine de tam yetki veriyoruz.
 
 `functions:` Her bir lambda fonksiyonlarımızın detaylarını barındıran bölüm. Lambda fonksiyonlarının isimlerini, başlangıç noktasının hangi dosyadaki hangi fonksiyon olacağını, environment değişkenlerini ve nerelerden event alabileceğini burada belirliyoruz. Ayrıca Api Gateway ayarlarımızıda her bir fonksiyon için burada ayarlıyoruz. 
 
