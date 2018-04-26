@@ -122,7 +122,7 @@ module.exports = {
 Bu konfigürasyon dosyası, serverless framework ile ilgili gereksinimleri ekliyor, javascript dosyalarının babel ile compile edilmesi gerektiğini belirtiyor ve javascript dependency structure'ının commonjs kütüphanesi ile çözümlenmesini sağlıyor.
  
 #### AWS Node.js SDK
-Node.js ile Amazon servislerini kullanmak için Amazon'un Node.js SDK'sı bize oldukça büyük kolaylık sağlıyor. Amazon'un sunduğu tüm servisler için hem Javascript hem de Typescript için kullanılan bu sdk sayesinde Amazon servisleri ile rahat bir şekilde haberleşebiliyoruz. Bir kaç örnek vermek gerekirse;
+Node.js ile Amazon servislerini kullanmak için Amazon'un Node.js SDK'sı oldukça büyük kolaylık sağlıyor. Amazon'un sunduğu tüm servisler için hem Javascript hem de Typescript'i destekliyor. Bir kaç örnek vermek gerekirse;
 
 DynamoDB'den kayıtları okumak için:
 
@@ -165,10 +165,10 @@ async function upload(postId, stream) {
 }
 ```
 
-AWS Node.js SDK hem callback hem de promise yapısını destekliyor. Burada promise yapısını kullanarak Javascript async await özelliği ile çok daha okunabilir fonksiyonlar yazdık.
+AWS Node.js SDK hem callback hem de promise yapısını destekliyor. Burada promise yapısı sayesinde Javascript async await özelliğini kullanmaya olanak sağlıyor.
 
 #### Yazılım Mimarisi
-Polly uygulaması üç adet javascript dosyasından oluşuyor. Javascript ES7 async await mimarisini de kullanarak tamamen asenkron bir yapıda çalışmakta. Her bir js dosyası webpack ve babel yardımı ile compile oluyor ve üç adet lambda fonksiyonunu çalıştırmak için kullanılıyor.
+Polly uygulaması üç adet javascript dosyasından oluşuyor. Javascript ES7 async await mimarisini de kullanarak tamamen asenkron bir yapıda çalışmaktadır. Her bir js dosyası webpack ve babel yardımı ile compile oluyor ve üç adet lambda fonksiyonunu çalıştırmak için kullanılıyor.
 
 `/static` klasörü içerisinde S3'e upload edilmek üzere SPA bir Web UI bulunmakta. Bu web uygulaması gelen request'i jquery kullanarak Api Gateway'e iletiyor ve response'a göre yeni kaydı bir tabloya ekliyor.
 
