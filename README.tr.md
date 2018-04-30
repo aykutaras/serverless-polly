@@ -4,7 +4,7 @@
 
 *Başka dilde oku: [English](README.md), [Türkçe](README.tr.md).*
 
-3 bölüm olacak AWS ile NLP çözümleri serimizin birincisinde Amazon'un [Polly](https://aws.amazon.com/polly/), [Lambda](https://aws.amazon.com/lambda/), [API Gateway](https://aws.amazon.com/api-gateway/), [S3](https://aws.amazon.com/s3/) ve [DynamoDB](https://aws.amazon.com/dynamodb/) araçlarını ve Javascript ES7 kullanarak hiç bir sunucu kurulumu gerektirmeden tamamen asenkron çalışan bir web uygulaması hazırlayacağız.
+AWS ile NLP çözümleri serimizin birincisinde Amazon'un [Polly](https://aws.amazon.com/polly/), [Lambda](https://aws.amazon.com/lambda/), [API Gateway](https://aws.amazon.com/api-gateway/), [S3](https://aws.amazon.com/s3/) ve [DynamoDB](https://aws.amazon.com/dynamodb/) araçlarını ve Javascript ES7 kullanarak hiç bir sunucu kurulumu gerektirmeden tamamen asenkron çalışan bir web uygulaması hazırlayacağız.
 
 Serverless-Polly, AWS üzerinde sunucusuz olarak çalışabilen bir "Text-to-Speech" uygulamasıdır. Static bir web sayfası üzerinden aldığı metni Lambda yardımı ile DynamoDB veritabanına kaydeder (newpost). Daha sonra DynamoDB Streams sayesinde yeni eklenen kayıt başka bir Lambda fonksiyonuna (convertaudio) iletir. İletilen kayıt, belirtilen dil ve okuması istenen kişiye göre Polly servisine yollanıp bir s3 bucket'ına mp3 formatında muhafaza edilir. Kaydedilen ses dosyalarına yine aynı web uygulaması üzerinden erişim sağlanır (getpost).
 
@@ -23,20 +23,20 @@ Yazının detaylarına inmeden çalışan uygulamayı görmek isterseniz yapman�
 ![InstallationGif](https://i.imgur.com/iBRROtd.gif)
 
 ## Servis Diagramı
-Kullanılan servislerin tümü AWS tarafından sağlanan serverless çözümlerdir. Bu çözümlerin hazırlanan uyglamada nasıl yer alacağına karar vermekse tabi ki yazılımcıya kalıyor. Uygulamanın örnek servis diagramını aşağıda görebilirsiniz:
+Kullanılan servislerin tümü AWS tarafından sağlanan `as a service` çözümlerdir. Bu çözümlerin hazırlanan uygulamada nasıl yer alacağına karar vermekse tabi ki yazılımcıya kalıyor. Uygulamanın örnek servis diagramını aşağıda görebilirsiniz:
 
 ![Service Diagram](ServerlessPolly.png)
 
 Sırayla kullanılan servisleri incelemek gerekirse:
 
 ### CloudFront
-Cloudfront Amazon'un CDN cözümü. Bu servisi static web uygulamalarını kıtalar arası hızlı bir şekilde host edebilmek için kullanılır. S3 bucket'ları ile entegrasyonu sayesinde uygulamanın statik web sayfalasını ve ses dosyalarını CloudFront üzerinden yayınlanabilir. Detaylarına bu yazıda değinmeyeceğiz.
+[Cloudfront](https://aws.amazon.com/cloudfront/) Amazon'un CDN cözümü. Bu servisi static web uygulamalarını kıtalar arası hızlı bir şekilde host edebilmek için kullanılır. S3 bucket'ları ile entegrasyonu sayesinde uygulamanın statik web sayfalasını ve ses dosyalarını CloudFront üzerinden yayınlanabilir. Detaylarına bu yazıda değinmeyeceğiz.
 
 ### S3 (Simple Storage Service)
-S3 Amazon'un nesne depolama çözümü. Polly uygulamasında hem static web uygulamasını hem de Polly ile seslendirilmiş mp3 dosyalarını tutmak için kullanılıyor. S3 servisinin avantajı oldukça ucuz olması ve cloudfront ile entegrasyonu. Ayrıca ekstra bir sunucu maliyeti getirmeden static web uygulamalarını host ediyor olması ve uptime'ının %99.99 seviyelerinde olması en büyük artıları.
+[S3](https://aws.amazon.com/s3/) Amazon'un nesne depolama çözümü. Polly uygulamasında hem static web uygulamasını hem de Polly ile seslendirilmiş mp3 dosyalarını tutmak için kullanılıyor. S3 servisinin avantajı oldukça ucuz olması ve cloudfront ile entegrasyonu. Ayrıca ekstra bir sunucu maliyeti getirmeden static web uygulamalarını host ediyor olması ve uptime'ının %99.99 seviyelerinde olması en büyük artıları.
 
 ### Api Gateway
-Api Gateway, Amazon'un servislerin ve sunucuların HTTP üzerinden haberleşmesini sağlayan serverless çözümü. Klasik Api Gateway'lerden (Zuul, Spring Rest Controller, vs.) en büyük farkı herhangi bir sunucu gerektirmediği için kolaylıkla ayağa kaldırıp istediğiniz sistemleri dış dünyaya açabilmeniz.
+[Api Gateway](https://aws.amazon.com/api-gateway/), Amazon'un servislerin ve sunucuların HTTP üzerinden haberleşmesini sağlayan serverless çözümü. Klasik Api Gateway'lerden (Zuul, Spring Rest Controller, vs.) en büyük farkı herhangi bir sunucu gerektirmediği için kolaylıkla ayağa kaldırıp istediğiniz sistemleri dış dünyaya açabilmeniz.
 
 Polly web uygulaması, statik bir SPA uygulaması olduğu için asıl logic amazon tarafında barınıyor. SPA uygulaması ajax ile Api Gateway'de bulunan iki tane endpoint'e erişerek gerekli işlemleri yapıyor.
 
@@ -47,7 +47,7 @@ Polly web uygulaması, statik bir SPA uygulaması olduğu için asıl logic amaz
 Api Gateway, bu iki endpoint'ten alınan isteklerin işlenebilmesi için Lambda fonksiyonlarına iletir.
 
 ### Lambda
-Lambda Amazon'un FaaS (Function as a Service) çözümü. Herhangi bir sunucuya ihtiyaç duymadan, scalable, event-driven uygulamalar yazılmasına olanak sağlayan bir servis. Şu an Node.js (JavaScript), Python, Java (Java 8 destekliyor), C# (.NET Core) ve Go dilleri ile uygulamalar yazmayı destekliyor.
+[Lambda](https://aws.amazon.com/lambda/) Amazon'un FaaS (Function as a Service) çözümü. Herhangi bir sunucuya ihtiyaç duymadan, scalable, event-driven uygulamalar yazılmasına olanak sağlayan bir servis. Şu an Node.js (JavaScript), Python, Java (Java 8 destekliyor), C# (.NET Core) ve Go dilleri ile uygulamalar yazmayı destekliyor.
 
 Polly uygulamasında, Javascript ile yazılmış 3 tane Lambda fonksiyonunu kullanacağız.
 
@@ -56,7 +56,7 @@ Polly uygulamasında, Javascript ile yazılmış 3 tane Lambda fonksiyonunu kull
 3. **ConvertAudio Lambda:** DynamoDB'ye eklenen yeni metni Polly ile haberleşerek MP3'e çevirir ve S3'e kaydeder.
 
 ### DynamoDB
-Yine serverless altyapısında barınan bir başka servis olan DynamoDB Amazon'un NoSQL çözümü. Aynı Lambda gibi auto-scale özelliği sayesinde gelen yüke göre donanım ihtiyaçlarını arka planda yükseltip alçaltabilen bir veritabanı olması en büyük avantajlarından. Ayrıca Streams özelliği sayesinde tablolarda yapılan değişiklikleri Lambda fonksiyonlarına event olarak iletebilir.
+Yine serverless altyapısında barınan bir başka servis olan [DynamoDB](https://aws.amazon.com/dynamodb/) Amazon'un NoSQL çözümü. Aynı Lambda gibi auto-scale özelliği sayesinde gelen yüke göre donanım ihtiyaçlarını arka planda yükseltip alçaltabilen bir veritabanı olması en büyük avantajlarından. Ayrıca Streams özelliği sayesinde tablolarda yapılan değişiklikleri Lambda fonksiyonlarına event olarak iletebilir.
 
 #### DynamoDB Streams
 DynamoDB, Amazon'un diğer servisleri ile haberleşebilmesi için Streams isminde bir hizmet sunuyor. DynamoDB Streams sayesinde tablolarda yapılan her değişiklik (ekleme, silme veya düzenleme) bir message stream'e daha sonra işlenmek üzere iletilir. Daha sonra bu stream'leri ister kendi sunucularınız üzerinden isterseniz de Lambda gibi çözümlere event olarak ileterek kullanabilirsiniz.
@@ -64,7 +64,7 @@ DynamoDB, Amazon'un diğer servisleri ile haberleşebilmesi için Streams ismind
 Polly uygulamasında yeni eklenen her metin bir stream ile bir Lambda fonksiyonuna iletilir. Bu sayede uyglama asenkron bir yapıda çalışır (metnin mp3'e çevrilmesi beklenmez).
 
 ### Polly
-Amazon'un metinlerin sesleştirilmesini sağlamak için sunduğu, yine serverless ekosisteminde bulunan çözümü. Polly kullanıcı açısından oldukça basit bir arayüz sunuyor.
+Amazon'un metinlerin sesleştirilmesini sağlamak için sunduğu, yine serverless ekosisteminde bulunan çözümü. [Polly](https://aws.amazon.com/polly/) kullanıcı açısından oldukça basit bir arayüz sunuyor.
 
 1. Metni gir
 2. Seslendirmesini istediğin kişiyi seç (Bir çok dil için birden fazla ses sanatçısı bulunuyor)
@@ -222,7 +222,7 @@ Serverless hangi fonksiyonların ve servislerin kurulacağını `serverless.yml`
 Polly uygulamasında kullanılan tüm Amazon servislerini ve konfigürasyonlarını `serverless.yml` dosyası altında inceleyebilirsiniz. Basit düzeyde AWS IAM ve AWS CloudFormation bilgisi gerekmekte olduğunu şimdiden belirtelim.
 
 #### CloudFormation
-CloudFormation AWS ekosisteminin Infrastructure as Code için geliştirdiği bir çözüm. Puppet, Chef ve Ansible bir alternatif olarak düşünebilirsiniz. CloudFormation için yml veya json formatında hazırladığınız template dosyaları sayesinde AWS üzerindeki tüm servisleri otomatize edebiliyorsunuz. Serverless Framework AWS servisleri için kendi yml dosyasını CloudFormation template yml dosyasına dönüştürerek servis kurulumlarını Amazon'un yapmasını sağlıyor.
+[CloudFormation](https://aws.amazon.com/cloudformation/) AWS ekosisteminin Infrastructure as Code için geliştirdiği bir çözüm. Puppet, Chef ve Ansible bir alternatif olarak düşünebilirsiniz. CloudFormation için yml veya json formatında hazırladığınız template dosyaları sayesinde AWS üzerindeki tüm servisleri otomatize edebiliyorsunuz. Serverless Framework AWS servisleri için kendi yml dosyasını CloudFormation template yml dosyasına dönüştürerek servis kurulumlarını Amazon'un yapmasını sağlıyor.
 
 Polly uygulamasında kullandığımız `serverless.yml` dosyası ilk başta oldukça karışık gelebilir. Fakat aslında oldukça basit bir yapıya sahip.
 
@@ -386,6 +386,6 @@ Bu yazımızda Serverless Framework kullanarak AWS Lambda ve AWS Polly ile metin
 * S3 için GB başına $0.0023
 * Polly için 1 milyon karakter için $4.00
 
-En düşük EC2 instance'ının $8.00 olduğunu düşünürsek uygulamanın çok daha düşük bir maliyetle çalıştığını görebilirsiniz.
+En düşük EC2 instance'ının aylık $8.00 olduğunu düşünürsek uygulamanın çok daha düşük bir maliyetle çalıştığını görebilirsiniz.
 
 Yazının ikinci bölümünde AWS transcribe ile yazılan metni istenilen dile çevirerek bu şekilde bir seslendirme yapılmasını sağlayacağız.
