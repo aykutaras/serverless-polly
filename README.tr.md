@@ -389,3 +389,7 @@ Bu yazımızda Serverless Framework kullanarak AWS Lambda ve AWS Polly ile metin
 En düşük EC2 instance'ının aylık $8.00 olduğunu düşünürsek uygulamanın çok daha düşük bir maliyetle çalıştığını görebilirsiniz.
 
 Yazının ikinci bölümünde AWS transcribe ile yazılan metni istenilen dile çevirerek bu şekilde bir seslendirme yapılmasını sağlayacağız.
+
+Çalışan uygulama örneği:
+
+![PollyUI](http://gifly.com/media_gifly/o/N/M/i/b/oNMi.gif)
