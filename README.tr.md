@@ -2,7 +2,7 @@
 
 ## Giriş
 
-*Başka dilde oku: [English](README.md), [Türkçe](README.tr.md).*
+*Başka dilde oku: [English](README.md)*
 
 AWS ile NLP çözümleri serimizin birincisinde Amazon'un [Polly](https://aws.amazon.com/polly/), [Lambda](https://aws.amazon.com/lambda/), [API Gateway](https://aws.amazon.com/api-gateway/), [S3](https://aws.amazon.com/s3/) ve [DynamoDB](https://aws.amazon.com/dynamodb/) araçlarını ve Javascript ES7 kullanarak hiç bir sunucu kurulumu gerektirmeden tamamen asenkron çalışan bir web uygulaması hazırlayacağız.
 
@@ -25,7 +25,7 @@ Yazının detaylarına inmeden çalışan uygulamayı görmek isterseniz yapman�
 ## Servis Diagramı
 Kullanılan servislerin tümü AWS tarafından sağlanan `as a service` çözümlerdir. Bu çözümlerin hazırlanan uygulamada nasıl yer alacağına karar vermekse tabi ki yazılımcıya kalıyor. Uygulamanın örnek servis diagramını aşağıda görebilirsiniz:
 
-![Service Diagram](ServerlessPolly.png)
+![Service Diagram](https://raw.githubusercontent.com/AWSTalks/serverless-polly/master/ServerlessPolly.png)
 
 Sırayla kullanılan servisleri incelemek gerekirse:
 
