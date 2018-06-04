@@ -13,7 +13,7 @@ Servislerin ve uygulamanın deployment süreçlerini de yine "[Infrastructure as
 Yazının detaylarına inmeden çalışan uygulamayı görmek isterseniz yapmanız gereken şey oldukça basit:
 
 1. AWS hesabı ve AccessKey ve Secret'a sahip bir user
-2. Node.js v8.11.1 
+2. Node.js v8.11.1
 3. `npm install serverless -g`
 4. `npm install`
 5. `serverless deploy`
