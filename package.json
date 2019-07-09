@@ -11,8 +11,8 @@
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.1",
-    "serverless-webpack": "^4.0.0",
-    "webpack": "^3.8.1",
+    "serverless-webpack": "^5.0.0",
+    "webpack": "^4.0.0",
     "webpack-node-externals": "^1.6.0"
   },
   "dependencies": {

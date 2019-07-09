@@ -5,12 +5,14 @@ const nodeExternals = require("webpack-node-externals");
 
 module.exports = {
   entry: slsw.lib.entries,
+  mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
+  devtool: 'source-map',
   target: 'node',
   externals: [nodeExternals()],
   module: {
-    loaders: [{
+    rules: [{
       test: /\.js$/,
-      loaders: ['babel-loader'],
+      use: [{ loader: 'babel-loader' }],
       include: __dirname,
       exclude: /node_modules/,
     }],
@@ -21,3 +23,4 @@ module.exports = {
     filename: '[name].js',
   },
 };
+
